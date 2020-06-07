@@ -36,6 +36,7 @@ export default function Variants() {
   const classes = useStyles();
   const [chat, setChat] = useState({ _id: null });
   const [texto, setTexto] = useState(null);
+  const [sending, setSending] = useState(false);
 
   const handleTextChange = (e) => {
     setTexto(e.target.value);
@@ -44,30 +45,47 @@ export default function Variants() {
     const { data } = await api.post("converse/helloworld");
     if (data) {
       setChat(data);
-      console.log(data);
     }
   };
 
-  const conversar = async () => {
-    const { data } = await api.post(`converse/helloworld/${chat._id}`, { text: texto });
-    if (data) {
-      setChat(data);
-      console.log(data);
+  const conversar = () => {
+    setSending(true);
+    api.post(`converse/helloworld/${chat._id}`, { text: texto })
+      .then(res=>{
+        if(res.data){
+          setChat(res.data);
+          setTexto("");
+          setSending(false);
+        }
+      })
     }
-    setTexto("");
-  };
 
   return (
     <Card>
-      <CardHeader title="Chat Demo" className={classes.title} />
+      <CardHeader title="Chat Bot Demo" className={classes.title} />
       <CardContent className={classes.content}>
         {chat._id ? (
           chat.messages.map((m) => (
             <MessageContent text={m.text} enviadoPelo={m.isFrom} />
           ))
         ) : (
-          <div />
-        )}
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)'
+              }}
+            >
+              <Button variant="contained"
+                color="primary"
+                size="large"
+                onClick={iniciarChat}
+                >
+                Iniciar conversa
+                </Button>
+            </div>
+          )}
       </CardContent>
       <CardActions className={classes.inputTexto}>
         <TextField
@@ -76,6 +94,7 @@ export default function Variants() {
           variant="outlined"
           fullWidth
           value={texto}
+          disabled = {!chat._id || sending }
           onChange={handleTextChange}
         />
         <Button
@@ -84,7 +103,8 @@ export default function Variants() {
           size="large"
           className={classes.button}
           endIcon={<SendIcon />}
-          onClick={chat._id ? conversar : iniciarChat}
+          disabled={!chat._id || sending }
+          onClick={conversar}
         >
           Enviar
         </Button>

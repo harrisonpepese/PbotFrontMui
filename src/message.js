@@ -1,16 +1,27 @@
-import { Box, Typography, Paper } from "@material-ui/core";
+import { Box, Typography, Paper, Grid } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
   paper: {
-    width: "20vw",
     padding: theme.spacing(1),
     margin: theme.spacing(1),
+    maxWidth:{
+      xs:'30vw',
+    }
   },
+  left:{
+    textAlign:'left'
+  },
+  right:{
+    textAlign:'right'
+  }
 }));
 export default (props) => {
   const { text, enviadoPelo } = props;
-  console.log(props)
   const classes = useStyles();
+  const displayText = () => {
+    const data = text.replace(/[\n\r]/g, '#').split('#')
+    return data.map(element => (<Typography>{element}</Typography>));
+  }
   const direction = (enviadoPelo) => {
     if (enviadoPelo == 'bot') {
       return "row";
@@ -18,14 +29,12 @@ export default (props) => {
     return "row-reverse";
   };
   return (
-    <Box display="flex" flexDirection={direction(enviadoPelo)}>
-      <Box>
+    <Grid container direction={direction(enviadoPelo)}>
+      <Grid item className={enviadoPelo == 'bot'?classes.left:classes.right}>
         <Paper className={classes.paper}>
-          <Typography>
-              {text}
-          </Typography>
+          {displayText()}
         </Paper>
-      </Box>
-    </Box>
+      </Grid>
+    </Grid>
   );
 };

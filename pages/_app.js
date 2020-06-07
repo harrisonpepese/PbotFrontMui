@@ -4,12 +4,18 @@ import Head from 'next/head';
 import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import theme from '../src/theme';
-import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Grid, Paper } from '@material-ui/core';
 import Link from 'next/link'
 
 const useStyles = makeStyles({
-  appBarItens:{
-    padding:theme.spacing(1)
+  appBarItens: {
+    padding: theme.spacing(1)
+  },
+  content:{
+    flexGrow: 1,
+    justifyContent: "center",
+    textAlign: "center",
+    padding: theme.spacing(2)
   }
 })
 
@@ -44,7 +50,13 @@ export default function MyApp(props) {
         </AppBar>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Component {...pageProps} />
+        <Grid container className={classes.content}>
+          <Grid item xs={12} sm={11} md={10} lg={9} xl={8}>
+            <Paper elevation={3}>
+              <Component {...pageProps} />
+            </Paper>
+          </Grid>
+        </Grid>
       </ThemeProvider>
     </React.Fragment>
   );
