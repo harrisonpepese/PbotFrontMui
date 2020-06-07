@@ -37,7 +37,7 @@ export default function MyApp(props) {
             <Link href="/">
               <Typography className={classes.appBarItens} variant="h6" >Pbot</Typography>
             </Link>
-            <Link href="/about">
+            <Link href="/fluxo">
               <Typography className={classes.appBarItens} variant="h6">Fluxos</Typography>
             </Link>
           </Toolbar>
