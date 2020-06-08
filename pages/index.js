@@ -7,8 +7,10 @@ import {
   CardActions,
   TextField,
   Button,
+  IconButton
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
+import ReplayIcon from "@material-ui/icons/Replay";
 import api from "../services/api";
 import MessageContent from "../src/message";
 
@@ -20,7 +22,8 @@ const useStyles = makeStyles((theme) => ({
     textAlign: "center",
   },
   title: {
-    background: "#009688",
+    background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
+    color: "#fff"
   },
   content: {
     height: "60vh",
@@ -30,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
   },
+  flex:{
+    flexGrow:1,
+  }
 }));
 
 export default function Variants() {
@@ -37,32 +43,46 @@ export default function Variants() {
   const [chat, setChat] = useState({ _id: null });
   const [texto, setTexto] = useState(null);
   const [sending, setSending] = useState(false);
-
+  const messageEndRef = React.useRef(null)
+  const scroll = () => {
+    messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
+  }
   const handleTextChange = (e) => {
     setTexto(e.target.value);
   };
+
   const iniciarChat = async () => {
     const { data } = await api.post("converse/helloworld");
     if (data) {
       setChat(data);
     }
   };
-
+  const inputCheck = () => {
+    return (!chat._id || sending || chat.isClosed)
+  }
   const conversar = () => {
     setSending(true);
     api.post(`converse/helloworld/${chat._id}`, { text: texto })
-      .then(res=>{
-        if(res.data){
+      .then(res => {
+        if (res.data) {
           setChat(res.data);
           setTexto("");
           setSending(false);
+          scroll()
         }
       })
-    }
+  }
 
   return (
     <Card>
-      <CardHeader title="Chat Bot Demo" className={classes.title} />
+      <CardHeader 
+      title="Pbot Demo - UI" 
+      className={classes.title} 
+      action={
+        chat.isClosed?<IconButton onClick={iniciarChat}>
+          <ReplayIcon/>
+        </IconButton>:<div/>
+      }/>
       <CardContent className={classes.content}>
         {chat._id ? (
           chat.messages.map((m) => (
@@ -81,11 +101,12 @@ export default function Variants() {
                 color="primary"
                 size="large"
                 onClick={iniciarChat}
-                >
+              >
                 Iniciar conversa
                 </Button>
             </div>
           )}
+        <div ref={messageEndRef} />
       </CardContent>
       <CardActions className={classes.inputTexto}>
         <TextField
@@ -93,9 +114,17 @@ export default function Variants() {
           label="Nova mensagem"
           variant="outlined"
           fullWidth
+          autoFocus
           value={texto}
-          disabled = {!chat._id || sending }
+          disabled={inputCheck()}
           onChange={handleTextChange}
+          onKeyPress={(ev) => {
+            console.log(`Pressed keyCode ${ev.key}`);
+            if (ev.key === 'Enter') {
+              conversar()
+              ev.preventDefault();
+            }
+          }}
         />
         <Button
           variant="contained"
@@ -103,7 +132,7 @@ export default function Variants() {
           size="large"
           className={classes.button}
           endIcon={<SendIcon />}
-          disabled={!chat._id || sending }
+          disabled={inputCheck()}
           onClick={conversar}
         >
           Enviar
