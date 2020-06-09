@@ -53,7 +53,7 @@ export default () => {
         {fluxos.map((f) => (
           <ListItem id={f._id} button>
             <Link href={`/fluxo/${f._id}`}>
-              <ListItemText primary="helloworld"></ListItemText>
+              <ListItemText primary={f.name}></ListItemText>
             </Link>
           </ListItem>
         ))}

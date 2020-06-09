@@ -7,7 +7,11 @@ import {
   CardActions,
   TextField,
   Button,
-  IconButton
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@material-ui/core";
 import SendIcon from "@material-ui/icons/Send";
 import ReplayIcon from "@material-ui/icons/Replay";
@@ -33,14 +37,15 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
   },
-  flex:{
-    flexGrow:1,
+  input:{
+    width:'20ch',
   }
 }));
 
 export default function Variants() {
   const classes = useStyles();
   const [chat, setChat] = useState({ _id: null });
+  const [flux, setFlux] = useState('helloworld');
   const [texto, setTexto] = useState(null);
   const [sending, setSending] = useState(false);
   const messageEndRef = React.useRef(null)
@@ -51,8 +56,13 @@ export default function Variants() {
     setTexto(e.target.value);
   };
 
+  const changeFlux = (value)=>{
+    setFlux(value);
+    setChat({_id:null})
+  } 
+
   const iniciarChat = async () => {
-    const { data } = await api.post("converse/helloworld");
+    const { data } = await api.post(`converse/${flux}`);
     if (data) {
       setChat(data);
     }
@@ -61,12 +71,16 @@ export default function Variants() {
     return (!chat._id || sending || chat.isClosed)
   }
   const conversar = () => {
+    if(inputCheck()){
+      return;
+    }
     setSending(true);
-    api.post(`converse/helloworld/${chat._id}`, { text: texto })
+    const text = texto;
+    setTexto("");
+    api.post(`converse/${flux}/${chat._id}`, { text })
       .then(res => {
         if (res.data) {
           setChat(res.data);
-          setTexto("");
           setSending(false);
           scroll()
         }
@@ -78,10 +92,21 @@ export default function Variants() {
       <CardHeader 
       title="Pbot Demo - UI" 
       className={classes.title} 
-      action={
-        chat.isClosed?<IconButton onClick={iniciarChat}>
+      action={<div>
+        <FormControl className={classes.input }>
+          <InputLabel>Fluxo</InputLabel>
+          <Select
+           value={flux}
+           onChange={(e) => changeFlux(e.target.value)}
+          > 
+          <MenuItem value='helloworld'>Apresentação</MenuItem>
+            <MenuItem value='urademo'>Ura Demo</MenuItem>
+          </Select>
+        </FormControl>
+        {chat.isClosed?<IconButton onClick={iniciarChat}>
           <ReplayIcon/>
-        </IconButton>:<div/>
+        </IconButton>:<div/>}
+        </div>
       }/>
       <CardContent className={classes.content}>
         {chat._id ? (
@@ -116,7 +141,6 @@ export default function Variants() {
           fullWidth
           autoFocus
           value={texto}
-          disabled={inputCheck()}
           onChange={handleTextChange}
           onKeyPress={(ev) => {
             console.log(`Pressed keyCode ${ev.key}`);

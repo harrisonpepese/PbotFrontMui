@@ -38,7 +38,7 @@ export default function MyApp(props) {
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider theme={theme}>
-        <AppBar position="static" color="primary">
+        {/*<AppBar position="static" color="primary">
           <Toolbar >
             <Link href="/">
               <Typography className={classes.appBarItens} variant="h6" >Pbot</Typography>
@@ -47,7 +47,7 @@ export default function MyApp(props) {
               <Typography className={classes.appBarItens} variant="h6">Fluxos</Typography>
             </Link>
           </Toolbar>
-        </AppBar>
+  </AppBar>*/}
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <Grid container className={classes.content}>
